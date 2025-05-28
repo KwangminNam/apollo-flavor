@@ -1,49 +1,50 @@
-# declare-apollo
+# apollo-flavor
 
-A declarative wrapper around Apollo Client that provides JSX components for more declarative data fetching with React Suspense and mutations.
+Apollo Client를 위한 선언적 래퍼로, React Suspense와 뮤테이션을 위한 JSX 컴포넌트를 제공합니다. 이 라이브러리는 [Toss/Suspensive](https://github.com/toss/suspensive)의 모티브를 받아 Apollo Client와 GraphQL을 사용하는 개발자들을 위해 만들어졌습니다.
 
-## Features
+## 주요 기능
 
-- 🚀 **Declarative**: Use `<SuspenseQuery>` and `<Mutation>` JSX components instead of hooks
-- 🔄 **Full Apollo Client compatibility**: Re-exports all Apollo Client functionality
-- ⚡ **React 18 Suspense**: Built-in support for React Suspense
-- 📦 **TypeScript**: Full TypeScript support with proper type inference
-- 🎯 **Better DX**: Clearer component boundaries and reduced prop drilling
-- 🔀 **Multiple Queries**: `useSuspenseQueries` and `useQueries` hooks for parallel data fetching
+- 🚀 **선언적 API**: 훅 대신 `<SuspenseQuery>`와 `<Mutation>` JSX 컴포넌트 사용
+- 🔄 **완벽한 Apollo Client 호환성**: 모든 Apollo Client 기능 재사용 가능
+- ⚡ **React 18/19 Suspense**: React Suspense 내장 지원
+- 📦 **TypeScript**: 완벽한 타입 추론 지원
+- 🎯 **향상된 개발 경험**: 명확한 컴포넌트 경계와 prop drilling 감소
+- 🔀 **다중 쿼리**: `useSuspenseQueries`와 `useQueries` 훅으로 병렬 데이터 페칭 지원
+- 🆕 **추가 기능**: Apollo Client에서 제공하지 않는 `useQueries`와 `useSuspenseQueries` 훅 구현
 
-## Installation
+## 설치
 
 ```bash
-npm install declare-apollo
+npm install apollo-flavor
 # or
-pnpm add declare-apollo
+pnpm add apollo-flavor
 # or
-yarn add declare-apollo
+yarn add apollo-flavor
 ```
 
-**Note**: This package includes Apollo Client as a peer dependency, so you don't need to install `@apollo/client` separately.
+**참고**: 이 패키지는 Apollo Client를 peer dependency로 포함하고 있어서 별도로 `@apollo/client`를 설치할 필요가 없습니다.
 
-## Usage
+## 사용법
 
-### SuspenseQuery Component
+### SuspenseQuery 컴포넌트
 
-Replace `useSuspenseQuery` hook with declarative `<SuspenseQuery>` component:
+`useSuspenseQuery` 훅을 선언적인 `<SuspenseQuery>` 컴포넌트로 대체:
 
-#### Before (with useSuspenseQuery)
+#### 이전 (useSuspenseQuery 사용)
 ```tsx
 import { useSuspenseQuery } from '@apollo/client';
 import { GET_POSTS, GET_USER } from './queries';
 
 const PostsPage = ({ userId }) => {
   return (
-    <Suspense fallback="Loading...">
+    <Suspense fallback="로딩 중...">
       <UserInfo userId={userId} />
       <PostList userId={userId} />
     </Suspense>
   );
 };
 
-// Separate components needed for data fetching
+// 데이터 페칭을 위한 별도 컴포넌트 필요
 const UserInfo = ({ userId }) => {
   const { data: user } = useSuspenseQuery(GET_USER, { variables: { userId } });
   return <UserProfile {...user} />;
@@ -58,14 +59,14 @@ const PostList = ({ userId }) => {
 };
 ```
 
-#### After (with SuspenseQuery)
+#### 이후 (SuspenseQuery 사용)
 ```tsx
-import { SuspenseQuery } from 'declare-apollo';
+import { SuspenseQuery } from 'apollo-flavor';
 import { GET_POSTS, GET_USER } from './queries';
 
 const PostsPage = ({ userId }) => {
   return (
-    <Suspense fallback="Loading...">
+    <Suspense fallback="로딩 중...">
       <SuspenseQuery query={GET_USER} variables={{ userId }}>
         {({ data: user }) => <UserProfile key={user.id} {...user} />}
       </SuspenseQuery>
@@ -86,15 +87,15 @@ const PostsPage = ({ userId }) => {
 };
 ```
 
-### useSuspenseQueries Hook
+### useSuspenseQueries 훅
 
-Execute multiple queries in parallel with Suspense support:
+Suspense를 지원하는 병렬 쿼리 실행:
 
 ```tsx
-import { useSuspenseQueries, getAllSuspenseQueriesData } from 'declare-apollo';
+import { useSuspenseQueries, getAllSuspenseQueriesData } from 'apollo-flavor';
 
 const UserDashboard = ({ userId }) => {
-  // Execute multiple queries in parallel - will suspend until all are resolved
+  // 여러 쿼리를 병렬로 실행 - 모든 쿼리가 완료될 때까지 Suspense
   const [userResult, postsResult, commentsResult] = useSuspenseQueries([
     {
       query: GET_USER,
@@ -109,11 +110,11 @@ const UserDashboard = ({ userId }) => {
     {
       query: GET_COMMENTS,
       variables: { userId },
-      pollInterval: 30000, // Poll for new comments
+      pollInterval: 30000, // 새 댓글 폴링
     },
   ]);
 
-  // Extract data using utility function
+  // 유틸리티 함수로 데이터 추출
   const [userData, postsData, commentsData] = getAllSuspenseQueriesData([
     userResult,
     postsResult,
@@ -133,25 +134,25 @@ const UserDashboard = ({ userId }) => {
       <UserProfile user={userData} />
       <PostsList posts={postsData} />
       <CommentsList comments={commentsData} />
-      <button onClick={handleRefreshAll}>Refresh All</button>
+      <button onClick={handleRefreshAll}>모두 새로고침</button>
     </div>
   );
 };
 
-// Wrap with Suspense
+// Suspense로 감싸기
 const App = () => (
-  <Suspense fallback={<div>Loading dashboard...</div>}>
+  <Suspense fallback={<div>대시보드 로딩 중...</div>}>
     <UserDashboard userId="123" />
   </Suspense>
 );
 ```
 
-### useQueries Hook
+### useQueries 훅
 
-Execute multiple queries in parallel without Suspense (traditional loading states):
+Suspense 없이 병렬 쿼리 실행 (전통적인 로딩 상태):
 
 ```tsx
-import { useQueries, areQueriesLoading, hasQueriesErrors } from 'declare-apollo';
+import { useQueries, areQueriesLoading, hasQueriesErrors } from 'apollo-flavor';
 
 const UserDashboard = ({ userId }) => {
   const [userResult, postsResult] = useQueries([
@@ -162,16 +163,16 @@ const UserDashboard = ({ userId }) => {
     {
       query: GET_POSTS,
       variables: { userId },
-      skip: !userId, // Conditional query
+      skip: !userId, // 조건부 쿼리
     },
   ]);
 
   if (areQueriesLoading([userResult, postsResult])) {
-    return <div>Loading...</div>;
+    return <div>로딩 중...</div>;
   }
 
   if (hasQueriesErrors([userResult, postsResult])) {
-    return <div>Error loading data</div>;
+    return <div>데이터 로딩 중 오류 발생</div>;
   }
 
   return (
@@ -183,11 +184,11 @@ const UserDashboard = ({ userId }) => {
 };
 ```
 
-### Mutation Component
+### Mutation 컴포넌트
 
-Replace `useMutation` hook with declarative `<Mutation>` component:
+`useMutation` 훅을 선언적인 `<Mutation>` 컴포넌트로 대체:
 
-#### Before (with useMutation)
+#### 이전 (useMutation 사용)
 ```tsx
 import { useMutation } from '@apollo/client';
 
@@ -196,7 +197,7 @@ const PostsPage = () => {
   return posts.map(post => <PostToUseMutation key={post.id} post={post} />);
 };
 
-// Unnecessary wrapper component
+// 불필요한 래퍼 컴포넌트
 const PostToUseMutation = ({ post }) => {
   const [editPost, { loading }] = useMutation(EDIT_POST);
   
@@ -213,9 +214,9 @@ const PostToUseMutation = ({ post }) => {
 };
 ```
 
-#### After (with Mutation)
+#### 이후 (Mutation 사용)
 ```tsx
-import { Mutation } from 'declare-apollo';
+import { Mutation } from 'apollo-flavor';
 
 const PostsPage = () => {
   const { data: posts } = useSuspenseQuery(GET_POSTS);
@@ -236,7 +237,7 @@ const PostsPage = () => {
 };
 ```
 
-## API Reference
+## API 레퍼런스
 
 ### SuspenseQuery
 
@@ -269,7 +270,7 @@ interface SuspenseQueryConfig<TData, TVariables> {
   onError?: (error: any) => void;
 }
 
-// Utility functions
+// 유틸리티 함수
 function getAllSuspenseQueriesData<T>(results: SuspenseQueriesResult<T>[]): T[];
 function hasSuspenseQueriesErrors(results: SuspenseQueriesResult[]): boolean;
 function getSuspenseQueriesErrors(results: SuspenseQueriesResult[]): any[];
@@ -283,7 +284,7 @@ function useQueries<T extends readonly QueryConfig[]>(
   queries: T
 ): QueriesResult[];
 
-// Utility functions
+// 유틸리티 함수
 function areQueriesLoading(results: QueriesResult[]): boolean;
 function hasQueriesErrors(results: QueriesResult[]): boolean;
 function getQueriesErrors(results: QueriesResult[]): any[];
@@ -301,18 +302,18 @@ interface MutationProps<TData, TVariables> {
 }
 ```
 
-## Benefits
+## 장점
 
-1. **Clearer Component Boundaries**: It's immediately clear which components trigger Suspense
-2. **Reduced Prop Drilling**: Data fetching happens at the same level as rendering
-3. **Easier Refactoring**: No need for wrapper components just to use hooks
-4. **Better Parallel Queries**: Multiple queries at the same level are automatically parallel
-5. **Presentational Components**: Child components become purely presentational
-6. **Flexible Query Patterns**: Choose between Suspense (`useSuspenseQueries`) or traditional loading states (`useQueries`)
+1. **명확한 컴포넌트 경계**: 어떤 컴포넌트가 Suspense를 트리거하는지 즉시 알 수 있음
+2. **Prop Drilling 감소**: 데이터 페칭이 렌더링과 같은 레벨에서 이루어짐
+3. **리팩토링 용이성**: 훅을 사용하기 위한 래퍼 컴포넌트가 필요 없음
+4. **병렬 쿼리 개선**: 같은 레벨의 여러 쿼리가 자동으로 병렬 처리됨
+5. **프레젠테이션 컴포넌트**: 자식 컴포넌트들이 순수하게 프레젠테이션 역할만 수행
+6. **유연한 쿼리 패턴**: Suspense(`useSuspenseQueries`) 또는 전통적인 로딩 상태(`useQueries`) 선택 가능
 
-## Apollo Client Compatibility
+## Apollo Client 호환성
 
-This package re-exports everything from `@apollo/client`, so you can use all Apollo Client features:
+이 패키지는 `@apollo/client`의 모든 기능을 재사용할 수 있게 해줍니다:
 
 ```tsx
 import { 
@@ -320,21 +321,21 @@ import {
   ApolloClient, 
   InMemoryCache,
   gql,
-  useQuery, // Still available if needed
-  useMutation, // Still available if needed
-  SuspenseQuery, // New declarative component
-  Mutation, // New declarative component
-  useSuspenseQueries, // New parallel suspense queries
-  useQueries // New parallel queries
-} from 'declare-apollo';
+  useQuery, // 필요시 사용 가능
+  useMutation, // 필요시 사용 가능
+  SuspenseQuery, // 새로운 선언적 컴포넌트
+  Mutation, // 새로운 선언적 컴포넌트
+  useSuspenseQueries, // 새로운 병렬 suspense 쿼리
+  useQueries // 새로운 병렬 쿼리
+} from 'apollo-flavor';
 ```
 
-## TypeScript Support
+## TypeScript 지원
 
-Full TypeScript support with proper type inference:
+완벽한 타입 추론 지원:
 
 ```tsx
-import { gql } from 'declare-apollo';
+import { gql } from 'apollo-flavor';
 
 const GET_USER = gql`
   query GetUser($id: ID!) {
@@ -346,15 +347,15 @@ const GET_USER = gql`
   }
 `;
 
-// TypeScript will infer the correct types
+// TypeScript가 올바른 타입을 추론
 <SuspenseQuery query={GET_USER} variables={{ id: "1" }}>
   {({ data }) => (
-    // data.user is properly typed
+    // data.user가 올바르게 타입 지정됨
     <div>{data.user.name}</div>
   )}
 </SuspenseQuery>
 ```
 
-## License
+## 라이선스
 
 MIT 

@@ -1,6 +1,6 @@
 {
   "name": "apollo-flavor",
-  "version": "1.0.3",
+  "version": "1.1.1",
   "description": "A declarative wrapper around Apollo Client with JSX components for SuspenseQuery and Mutation",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -28,19 +28,23 @@
   "author": "KwangminNam",
   "license": "MIT",
   "peerDependencies": {
-    "@apollo/client": "^3.8.0",
-    "react": "^18.0.0",
-    "graphql": "^16.0.0"
+    "@apollo/client": "^3.9.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "next": "^15.0.0"
   },
   "devDependencies": {
-    "@apollo/client": "^3.8.8",
+    "@apollo/client": "^3.9.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@types/react": "^18.2.45",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@types/jest": "^29.5.8",
     "jest": "^29.7.0",
-    "react": "^18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "^15.2.3",
     "graphql": "^16.8.1",
     "rollup": "^4.6.1",
     "rollup-plugin-dts": "^6.1.0",
@@ -51,11 +55,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/declare-apollo.git"
+    "url": "https://github.com/KwangminNam/apollo-flavor.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/declare-apollo/issues"
+    "url": "https://github.com/KwangminNam/apollo-flavor/issues"
   },
-  "homepage": "https://github.com/yourusername/declare-apollo#readme",
+  "homepage": "https://github.com/KwangminNam/apollo-flavor#readme",
   "packageManager": "pnpm@9.0.1+sha1.0e0a9c2d140ddf9aab730067eb7bcfb9e18bdee7"
 }
