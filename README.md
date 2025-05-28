@@ -11,6 +11,7 @@ Apollo Client를 위한 선언적 래퍼로, React Suspense와 뮤테이션을 �
 - ⚡ **React 18/19 Suspense**: React Suspense 내장 지원
 - 📦 **TypeScript**: 완벽한 타입 추론 지원
 - 🎯 **향상된 개발 경험**: 명확한 컴포넌트 경계와 prop drilling 감소
+- ⌨️ Apollo-client에는 없지만 Tanstack query에는 있는 비동기처리에 유용한 hook들도 지속적으로 만들 예정 입니다.
 - 🔀 **다중 쿼리**: `useSuspenseQueries`와 `useQueries` 훅으로 병렬 데이터 페칭 지원
 - 🆕 **추가 기능**: Apollo Client에서 제공하지 않는 `useQueries`와 `useSuspenseQueries` 훅 구현
 
