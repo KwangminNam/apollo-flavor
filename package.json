@@ -1,0 +1,61 @@
+{
+  "name": "apollo-flavor",
+  "version": "1.0.2",
+  "description": "A declarative wrapper around Apollo Client with JSX components for SuspenseQuery and Mutation",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "prepublishOnly": "npm run build",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "apollo",
+    "apollo-client",
+    "react",
+    "graphql",
+    "suspense",
+    "mutation",
+    "declarative",
+    "jsx"
+  ],
+  "author": "KwangminNam",
+  "license": "MIT",
+  "peerDependencies": {
+    "@apollo/client": "^3.8.0",
+    "react": "^18.0.0",
+    "graphql": "^16.0.0"
+  },
+  "devDependencies": {
+    "@apollo/client": "^3.8.8",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/react": "^18.2.45",
+    "@types/jest": "^29.5.8",
+    "jest": "^29.7.0",
+    "react": "^18.2.0",
+    "graphql": "^16.8.1",
+    "rollup": "^4.6.1",
+    "rollup-plugin-dts": "^6.1.0",
+    "typescript": "^5.3.2",
+    "tslib": "^2.6.2",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/jest-dom": "^6.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/declare-apollo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/declare-apollo/issues"
+  },
+  "homepage": "https://github.com/yourusername/declare-apollo#readme",
+  "packageManager": "pnpm@9.0.1+sha1.0e0a9c2d140ddf9aab730067eb7bcfb9e18bdee7"
+}
