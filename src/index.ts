@@ -21,8 +21,20 @@ export {
   getAllQueriesData
 } from './hooks/useQueries';
 
+export {
+  useSuspenseQueries,
+  hasSuspenseQueriesErrors,
+  getSuspenseQueriesErrors,
+  getAllSuspenseQueriesData,
+  refetchAllSuspenseQueries
+} from './hooks/useSuspenseQueries';
+
 // Export types
 export type { SuspenseQueryProps } from './components/SuspenseQuery';
 export type { MutationProps, MutationRenderProps } from './components/Mutation';
 export type { QueryProps } from './components/Query';
 export type { SubscriptionProps } from './components/Subscription';
+
+// Export hook types
+export type { QueryConfig, QueriesResult } from './hooks/useQueries';
+export type { SuspenseQueryConfig, SuspenseQueriesResult } from './hooks/useSuspenseQueries';

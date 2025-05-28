@@ -9,6 +9,7 @@ A declarative wrapper around Apollo Client that provides JSX components for more
 - ⚡ **React 18 Suspense**: Built-in support for React Suspense
 - 📦 **TypeScript**: Full TypeScript support with proper type inference
 - 🎯 **Better DX**: Clearer component boundaries and reduced prop drilling
+- 🔀 **Multiple Queries**: `useSuspenseQueries` and `useQueries` hooks for parallel data fetching
 
 ## Installation
 
@@ -85,6 +86,103 @@ const PostsPage = ({ userId }) => {
 };
 ```
 
+### useSuspenseQueries Hook
+
+Execute multiple queries in parallel with Suspense support:
+
+```tsx
+import { useSuspenseQueries, getAllSuspenseQueriesData } from 'declare-apollo';
+
+const UserDashboard = ({ userId }) => {
+  // Execute multiple queries in parallel - will suspend until all are resolved
+  const [userResult, postsResult, commentsResult] = useSuspenseQueries([
+    {
+      query: GET_USER,
+      variables: { id: userId },
+      errorPolicy: 'all',
+    },
+    {
+      query: GET_POSTS,
+      variables: { userId },
+      errorPolicy: 'all',
+    },
+    {
+      query: GET_COMMENTS,
+      variables: { userId },
+      pollInterval: 30000, // Poll for new comments
+    },
+  ]);
+
+  // Extract data using utility function
+  const [userData, postsData, commentsData] = getAllSuspenseQueriesData([
+    userResult,
+    postsResult,
+    commentsResult,
+  ]);
+
+  const handleRefreshAll = async () => {
+    await Promise.all([
+      userResult.refetch(),
+      postsResult.refetch(),
+      commentsResult.refetch(),
+    ]);
+  };
+
+  return (
+    <div>
+      <UserProfile user={userData} />
+      <PostsList posts={postsData} />
+      <CommentsList comments={commentsData} />
+      <button onClick={handleRefreshAll}>Refresh All</button>
+    </div>
+  );
+};
+
+// Wrap with Suspense
+const App = () => (
+  <Suspense fallback={<div>Loading dashboard...</div>}>
+    <UserDashboard userId="123" />
+  </Suspense>
+);
+```
+
+### useQueries Hook
+
+Execute multiple queries in parallel without Suspense (traditional loading states):
+
+```tsx
+import { useQueries, areQueriesLoading, hasQueriesErrors } from 'declare-apollo';
+
+const UserDashboard = ({ userId }) => {
+  const [userResult, postsResult] = useQueries([
+    {
+      query: GET_USER,
+      variables: { id: userId },
+    },
+    {
+      query: GET_POSTS,
+      variables: { userId },
+      skip: !userId, // Conditional query
+    },
+  ]);
+
+  if (areQueriesLoading([userResult, postsResult])) {
+    return <div>Loading...</div>;
+  }
+
+  if (hasQueriesErrors([userResult, postsResult])) {
+    return <div>Error loading data</div>;
+  }
+
+  return (
+    <div>
+      <UserProfile user={userResult.data} />
+      <PostsList posts={postsResult.data} />
+    </div>
+  );
+};
+```
+
 ### Mutation Component
 
 Replace `useMutation` hook with declarative `<Mutation>` component:
@@ -151,6 +249,48 @@ interface SuspenseQueryProps<TData, TVariables> {
 }
 ```
 
+### useSuspenseQueries
+
+```tsx
+function useSuspenseQueries<T extends readonly SuspenseQueryConfig[]>(
+  queries: T
+): SuspenseQueriesResult[];
+
+interface SuspenseQueryConfig<TData, TVariables> {
+  query: DocumentNode;
+  variables?: TVariables;
+  skip?: boolean;
+  errorPolicy?: 'none' | 'ignore' | 'all';
+  fetchPolicy?: 'cache-first' | 'cache-and-network' | 'network-only' | 'no-cache';
+  notifyOnNetworkStatusChange?: boolean;
+  pollInterval?: number;
+  context?: any;
+  onCompleted?: (data: TData) => void;
+  onError?: (error: any) => void;
+}
+
+// Utility functions
+function getAllSuspenseQueriesData<T>(results: SuspenseQueriesResult<T>[]): T[];
+function hasSuspenseQueriesErrors(results: SuspenseQueriesResult[]): boolean;
+function getSuspenseQueriesErrors(results: SuspenseQueriesResult[]): any[];
+function refetchAllSuspenseQueries(results: SuspenseQueriesResult[]): Promise<any[]>;
+```
+
+### useQueries
+
+```tsx
+function useQueries<T extends readonly QueryConfig[]>(
+  queries: T
+): QueriesResult[];
+
+// Utility functions
+function areQueriesLoading(results: QueriesResult[]): boolean;
+function hasQueriesErrors(results: QueriesResult[]): boolean;
+function getQueriesErrors(results: QueriesResult[]): any[];
+function areQueriesComplete(results: QueriesResult[]): boolean;
+function getAllQueriesData<T>(results: QueriesResult<T>[]): (T | undefined)[];
+```
+
 ### Mutation
 
 ```tsx
@@ -168,6 +308,7 @@ interface MutationProps<TData, TVariables> {
 3. **Easier Refactoring**: No need for wrapper components just to use hooks
 4. **Better Parallel Queries**: Multiple queries at the same level are automatically parallel
 5. **Presentational Components**: Child components become purely presentational
+6. **Flexible Query Patterns**: Choose between Suspense (`useSuspenseQueries`) or traditional loading states (`useQueries`)
 
 ## Apollo Client Compatibility
 
@@ -182,7 +323,9 @@ import {
   useQuery, // Still available if needed
   useMutation, // Still available if needed
   SuspenseQuery, // New declarative component
-  Mutation // New declarative component
+  Mutation, // New declarative component
+  useSuspenseQueries, // New parallel suspense queries
+  useQueries // New parallel queries
 } from 'declare-apollo';
 ```
 

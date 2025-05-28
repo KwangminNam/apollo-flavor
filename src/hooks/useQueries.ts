@@ -36,10 +36,10 @@ export interface QueriesResult<TData = any> {
 export function useQueries<T extends readonly QueryConfig[]>(
   queries: T
 ): {
-  [K in keyof T]: T[K] extends QueryConfig<infer TData, any> 
-    ? QueriesResult<TData> 
+    [K in keyof T]: T[K] extends QueryConfig<infer TData, any>
+    ? QueriesResult<TData>
     : QueriesResult;
-} {
+  } {
   // Execute all queries using useQuery hook
   const results = queries.map((queryConfig) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -58,7 +58,7 @@ export function useQueries<T extends readonly QueryConfig[]>(
 
   // Transform results to match our interface
   return useMemo(() => {
-    return results.map((result: QueryResult) => ({
+    const result = results.map((result: QueryResult) => ({
       data: result.data,
       loading: result.loading,
       error: result.error,
@@ -71,6 +71,14 @@ export function useQueries<T extends readonly QueryConfig[]>(
       stopPolling: result.stopPolling,
       subscribeToMore: result.subscribeToMore,
     }));
+    return [result, {
+      hasErrors: hasQueriesErrors(result),
+      errors: getQueriesErrors(result),
+      areComplete: areQueriesComplete(result),
+      areLoading: areQueriesLoading(result),
+      data: getAllQueriesData(result),
+      refetchAll: refetchAllQueries(result),
+    }];
   }, [results]) as any;
 }
 
@@ -114,4 +122,8 @@ export function getCombinedLoadingState(results: QueriesResult[]): boolean {
  */
 export function getAllQueriesData<T = any>(results: QueriesResult<T>[]): (T | undefined)[] {
   return results.map(result => result.data);
-} 
+}
+
+export function refetchAllQueries(results: QueriesResult[]): Promise<any[]> {
+  return Promise.all(results.map(result => result.refetch()));
+}

@@ -1,6 +1,6 @@
 {
   "name": "apollo-flavor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A declarative wrapper around Apollo Client with JSX components for SuspenseQuery and Mutation",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
