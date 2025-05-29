@@ -15,16 +15,14 @@ export interface QueryProps<TData = any, TVariables extends OperationVariables =
   options?: Omit<QueryHookOptions<TData, TVariables>, 'query' | 'variables'>;
 }
 
-export function Query<TData = any, TVariables extends OperationVariables = OperationVariables>({
+/**
+ * Query component compatible with React 18/19 and Next.js 12-15
+ * Following TanStack Query pattern for React 18 compatibility
+ */
+export const Query = <TData = any, TVariables extends OperationVariables = OperationVariables>({
   query,
   variables,
   children,
   options = {},
-}: QueryProps<TData, TVariables>) {
-  const result = useQuery<TData, TVariables>(query, {
-    variables,
-    ...options,
-  });
-
-  return <>{children(result)}</>;
-} 
+}: QueryProps<TData, TVariables>) => 
+  <>{children(useQuery<TData, TVariables>(query, { variables, ...options }))}</>; 

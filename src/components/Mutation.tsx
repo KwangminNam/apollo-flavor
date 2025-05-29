@@ -24,12 +24,15 @@ export interface MutationProps<TData = any, TVariables extends OperationVariable
   options?: MutationHookOptions<TData, TVariables>;
 }
 
-export function Mutation<TData = any, TVariables extends OperationVariables = OperationVariables>({
+/**
+ * Mutation component compatible with React 18/19 and Next.js 12-15
+ * Following TanStack Query pattern for React 18 compatibility
+ */
+export const Mutation = <TData = any, TVariables extends OperationVariables = OperationVariables>({
   mutation,
   children,
   options = {},
-}: MutationProps<TData, TVariables>) {
+}: MutationProps<TData, TVariables>) => {
   const [mutate, { data, loading, error, called, reset }] = useMutation<TData, TVariables>(mutation, options);
-
   return <>{children({ mutate, data, loading, error, called, reset })}</>;
-} 
+}; 

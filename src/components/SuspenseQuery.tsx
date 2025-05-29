@@ -1,48 +1,35 @@
-import React, { Suspense } from 'react';
 import {
   useSuspenseQuery,
-  SuspenseQueryHookOptions,
-  TypedDocumentNode,
-  DocumentNode,
-  OperationVariables,
-  UseSuspenseQueryResult,
-} from '@apollo/client';
+  type SuspenseQueryHookOptions,
+  type TypedDocumentNode,
+  type DocumentNode,
+  type OperationVariables,
+  type UseSuspenseQueryResult,
+} from "@apollo/client";
+import type { ReactNode } from "react";
 
-export interface SuspenseQueryProps<TData = any, TVariables extends OperationVariables = OperationVariables> {
-  query: DocumentNode | TypedDocumentNode<TData, TVariables>;
-  variables?: TVariables;
-  children: (result: UseSuspenseQueryResult<TData, TVariables>) => React.ReactNode;
-  options?: Omit<SuspenseQueryHookOptions<TData, TVariables>, 'query' | 'variables'>;
-  selector?: (data: TData) => TData;
-  fallback?: React.ReactNode;
-}
-
-function SuspenseQueryInner<TData = any, TVariables extends OperationVariables = OperationVariables>({
+/**
+ * SuspenseQuery component compatible with React 18/19 and Next.js 12-15
+ * Note: This component should be wrapped with <Suspense> by the user
+ * 
+ * Following TanStack Query pattern for React 18 compatibility
+ * @example
+ * ```tsx
+ * <SuspenseQuery query={GET_USER} variables={{ id: '1' }}>
+ *   {({ data }) => <div>{data.user.name}</div>}
+ * </SuspenseQuery>
+ * ```
+ */
+export const SuspenseQuery = <
+  TData = any,
+  TVariables extends OperationVariables = OperationVariables
+>({
+  children,
   query,
   variables,
-  children,
-  options = {},
-  selector,
-}: Omit<SuspenseQueryProps<TData, TVariables>, 'fallback'>) {
-  const result = useSuspenseQuery<TData, TVariables>(query, {
-    variables,
-    ...options,
-  });
-
-  const transformedResult = selector 
-    ? { ...result, data: selector(result.data) }
-    : result;
-
-  return <>{children(transformedResult)}</>;
-}
-
-export function SuspenseQuery<TData = any, TVariables extends OperationVariables = OperationVariables>({
-  fallback = <div>Loading...</div>,
-  ...props
-}: SuspenseQueryProps<TData, TVariables>) {
-  return (
-    <Suspense fallback={fallback}>
-      <SuspenseQueryInner {...props} />
-    </Suspense>
-  );
-} 
+  ...options
+}: SuspenseQueryHookOptions<TData, TVariables> & {
+  children: (result: UseSuspenseQueryResult<TData, TVariables>) => ReactNode;
+  query: DocumentNode | TypedDocumentNode<TData, TVariables>;
+  variables?: TVariables;
+}) => <>{children(useSuspenseQuery<TData, TVariables>(query, { variables, ...options }))}</>;

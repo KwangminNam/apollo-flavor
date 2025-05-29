@@ -25,7 +25,7 @@ module.exports = [
       commonjs(),
       typescript({ tsconfig: './tsconfig.json' }),
     ],
-    external: ['react', '@apollo/client', 'graphql'],
+    external: ['react', 'react-dom', 'react/jsx-runtime', '@apollo/client', 'graphql'],
   },
   {
     input: 'dist/index.d.ts',
