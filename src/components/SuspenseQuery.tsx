@@ -15,7 +15,14 @@ import type { ReactNode } from "react";
  * Following TanStack Query pattern for React 18 compatibility
  * @example
  * ```tsx
- * <SuspenseQuery query={GET_USER} variables={{ id: '1' }}>
+ * <SuspenseQuery
+ *  <DogResponse,DogVariables>
+ *  query={GET_USER}
+ *  variables={{ id: '1' }}
+ *  options={{
+ *    fetchPolicy: 'network-only',
+ *  }}
+ * >
  *   {({ data }) => <div>{data.user.name}</div>}
  * </SuspenseQuery>
  * ```
