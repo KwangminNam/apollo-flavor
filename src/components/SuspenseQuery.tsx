@@ -1,17 +1,17 @@
 import {
-  useSuspenseQuery,
-  type SuspenseQueryHookOptions,
-  type TypedDocumentNode,
-  type DocumentNode,
-  type OperationVariables,
-  type UseSuspenseQueryResult,
+	type DocumentNode,
+	type OperationVariables,
+	type SuspenseQueryHookOptions,
+	type TypedDocumentNode,
+	type UseSuspenseQueryResult,
+	useSuspenseQuery,
 } from "@apollo/client";
 import type { ReactNode } from "react";
 
 /**
  * SuspenseQuery component compatible with React 18/19 and Next.js 12-15
  * Note: This component should be wrapped with <Suspense> by the user
- * 
+ *
  * Following TanStack Query pattern for React 18 compatibility
  * @example
  * ```tsx
@@ -28,15 +28,22 @@ import type { ReactNode } from "react";
  * ```
  */
 export const SuspenseQuery = <
-  TData = any,
-  TVariables extends OperationVariables = OperationVariables
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	TData = any,
+	TVariables extends OperationVariables = OperationVariables,
 >({
-  children,
-  query,
-  variables,
-  ...options
+	children,
+	query,
+	variables,
+	...options
 }: SuspenseQueryHookOptions<TData, TVariables> & {
-  children: (result: UseSuspenseQueryResult<TData, TVariables>) => ReactNode;
-  query: DocumentNode | TypedDocumentNode<TData, TVariables>;
-  variables?: TVariables;
-}) => <>{children(useSuspenseQuery<TData, TVariables>(query, { variables, ...options }))}</>;
+	children: (result: UseSuspenseQueryResult<TData, TVariables>) => ReactNode;
+	query: DocumentNode | TypedDocumentNode<TData, TVariables>;
+	variables?: TVariables;
+}) => (
+	<>
+		{children(
+			useSuspenseQuery<TData, TVariables>(query, { variables, ...options }),
+		)}
+	</>
+);

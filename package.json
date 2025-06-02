@@ -1,68 +1,69 @@
 {
-  "name": "apollo-flavor",
-  "version": "1.4.2",
-  "description": "A declarative wrapper around Apollo Client with JSX components for SuspenseQuery and Mutation",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "prepublishOnly": "npm run build",
-    "type-check": "tsc --noEmit"
-  },
-  "keywords": [
-    "apollo",
-    "apollo-client",
-    "react",
-    "graphql",
-    "suspense",
-    "mutation",
-    "declarative",
-    "jsx"
-  ],
-  "author": "KwangminNam",
-  "license": "MIT",
-  "peerDependencies": {
-    "@apollo/client": "^3.8.0",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
-  },
-  "devDependencies": {
-    "@apollo/client": "^3.8.8",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-typescript": "^11.1.5",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitest/coverage-v8": "3.1.4",
-    "@vitest/ui": "^3.1.4",
-    "graphql": "^16.8.1",
-    "jsdom": "^26.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "rollup": "^4.6.1",
-    "rollup-plugin-dts": "^6.1.0",
-    "tslib": "^2.6.2",
-    "typescript": "^5.3.2",
-    "vitest": "^3.1.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/KwangminNam/apollo-flavor.git"
-  },
-  "bugs": {
-    "url": "https://github.com/KwangminNam/apollo-flavor/issues"
-  },
-  "homepage": "https://github.com/KwangminNam/apollo-flavor#readme",
-  "packageManager": "pnpm@9.0.1+sha1.0e0a9c2d140ddf9aab730067eb7bcfb9e18bdee7"
+	"name": "apollo-flavor",
+	"version": "1.4.2",
+	"description": "A declarative wrapper around Apollo Client with JSX components for SuspenseQuery and Mutation",
+	"main": "dist/index.js",
+	"module": "dist/index.esm.js",
+	"types": "dist/index.d.ts",
+	"files": ["dist"],
+	"scripts": {
+		"build": "rollup -c",
+		"dev": "rollup -c -w",
+		"test": "vitest",
+		"test:ui": "vitest --ui",
+		"test:run": "vitest run",
+		"prepublishOnly": "npm run build",
+		"type-check": "tsc --noEmit",
+		"check": "biome check --write --unsafe",
+		"format": "biome format --write --unsafe"
+	},
+	"keywords": [
+		"apollo",
+		"apollo-client",
+		"react",
+		"graphql",
+		"suspense",
+		"mutation",
+		"declarative",
+		"jsx"
+	],
+	"author": "KwangminNam",
+	"license": "MIT",
+	"peerDependencies": {
+		"@apollo/client": "^3.8.0",
+		"react": "^18.0.0 || ^19.0.0",
+		"react-dom": "^18.0.0 || ^19.0.0"
+	},
+	"devDependencies": {
+		"@apollo/client": "^3.8.8",
+		"@biomejs/biome": "1.9.4",
+		"@rollup/plugin-commonjs": "^25.0.7",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-typescript": "^11.1.5",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/react": "^16.3.0",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/react": "^19.0.0",
+		"@types/react-dom": "^19.0.0",
+		"@vitest/coverage-v8": "3.1.4",
+		"@vitest/ui": "^3.1.4",
+		"graphql": "^16.8.1",
+		"jsdom": "^26.1.0",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"rollup": "^4.6.1",
+		"rollup-plugin-dts": "^6.1.0",
+		"tslib": "^2.6.2",
+		"typescript": "^5.3.2",
+		"vitest": "^3.1.4"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/KwangminNam/apollo-flavor.git"
+	},
+	"bugs": {
+		"url": "https://github.com/KwangminNam/apollo-flavor/issues"
+	},
+	"homepage": "https://github.com/KwangminNam/apollo-flavor#readme",
+	"packageManager": "pnpm@9.0.1+sha1.0e0a9c2d140ddf9aab730067eb7bcfb9e18bdee7"
 }
