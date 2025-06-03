@@ -1,47 +1,45 @@
-import { type QueryResult, useQuery } from "@apollo/client";
+import { 
+  type QueryResult, 
+  useQuery, 
+  type ApolloError, 
+  type ApolloQueryResult, 
+  type OperationVariables,
+  type SubscribeToMoreOptions
+} from "@apollo/client";
 import type { DocumentNode } from "graphql";
 import { useMemo } from "react";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export interface QueryConfig<TData = any, TVariables = any> {
+export interface QueryConfig<TData = unknown, TVariables extends OperationVariables = OperationVariables> {
   query: DocumentNode;
   variables?: TVariables;
   skip?: boolean;
   errorPolicy?: "none" | "ignore" | "all";
   fetchPolicy?:
-  | "cache-first"
-  | "cache-and-network"
-  | "network-only"
-  | "cache-only"
-  | "no-cache"
-  | "standby";
+    | "cache-first"
+    | "cache-and-network"
+    | "network-only"
+    | "cache-only"
+    | "no-cache"
+    | "standby";
   notifyOnNetworkStatusChange?: boolean;
   pollInterval?: number;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  context?: any;
+  context?: Record<string, unknown>;
   onCompleted?: (data: TData) => void;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  onError?: (error: any) => void;
+  onError?: (error: ApolloError) => void;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export interface QueriesResult<TData = any> {
+export interface QueriesResult<TData = unknown, TVariables extends OperationVariables = OperationVariables> {
   data?: TData;
   loading: boolean;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  error?: any;
+  error?: ApolloError;
   called: boolean;
   networkStatus: number;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  refetch: () => Promise<any>;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  fetchMore: (options: any) => Promise<any>;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  updateQuery: (updater: any) => void;
+  refetch: (variables?: Partial<TVariables>) => Promise<ApolloQueryResult<TData>>;
+  fetchMore: (options: { variables?: Partial<TVariables> }) => Promise<ApolloQueryResult<TData>>;
+  updateQuery: (updater: (prev: TData | undefined) => TData) => void;
   startPolling: (pollInterval: number) => void;
   stopPolling: () => void;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  subscribeToMore: (options: any) => () => void;
+  subscribeToMore: (options: SubscribeToMoreOptions<TData, TVariables>) => () => void;
 }
 
 /**
@@ -51,11 +49,10 @@ export interface QueriesResult<TData = any> {
 export function useQueries<T extends readonly QueryConfig[]>(
   queries: T,
 ): {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    [K in keyof T]: T[K] extends QueryConfig<infer TData, any>
-    ? QueriesResult<TData>
-    : QueriesResult;
-  } {
+    [K in keyof T]: T[K] extends QueryConfig<infer TData, infer TVariables>
+      ? QueriesResult<TData, TVariables>
+      : QueriesResult<unknown, OperationVariables>;
+} {
   // Execute all queries using useQuery hook
   const results = queries.map((queryConfig) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -88,19 +85,12 @@ export function useQueries<T extends readonly QueryConfig[]>(
       stopPolling: result.stopPolling,
       subscribeToMore: result.subscribeToMore,
     }));
-    return [
-      result,
-      {
-        hasErrors: hasQueriesErrors(result),
-        errors: getQueriesErrors(result),
-        areComplete: areQueriesComplete(result),
-        areLoading: areQueriesLoading(result),
-        data: getAllQueriesData(result),
-        refetchAll: refetchAllQueries(result),
-      },
-    ];
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  }, [results]) as any;
+    return result as unknown as {
+      [K in keyof T]: T[K] extends QueryConfig<infer TData, infer TVariables>
+        ? QueriesResult<TData, TVariables>
+        : QueriesResult<unknown, OperationVariables>;
+    };
+  }, [results]);
 }
 
 /**
@@ -120,10 +110,8 @@ export function hasQueriesErrors(results: QueriesResult[]): boolean {
 /**
  * Utility function to get all errors from queries
  */
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export  function getQueriesErrors(results: QueriesResult[]): any[] {
-  return results.filter((result) => result.error).map((result) => result.error);
+export function getQueriesErrors(results: QueriesResult[]): ApolloError[] {
+  return results.filter((result) => result.error).map((result) => result.error as ApolloError);
 }
 
 /**
@@ -145,15 +133,12 @@ export function getCombinedLoadingState(results: QueriesResult[]): boolean {
 /**
  * Utility function to get all data from queries
  */
-
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export  function getAllQueriesData<T = any>(
-  results: QueriesResult<T>[],
+export function getAllQueriesData<T = unknown>(
+  results: QueriesResult<T>[]
 ): (T | undefined)[] {
   return results.map((result) => result.data);
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-export function refetchAllQueries(results: QueriesResult[]): Promise<any[]> {
+export function refetchAllQueries(results: QueriesResult[]): Promise<ApolloQueryResult<unknown>[]> {
   return Promise.all(results.map((result) => result.refetch()));
 }

@@ -28,8 +28,7 @@ import type { ReactNode } from "react";
  * ```
  */
 export const SuspenseQuery = <
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 >({
 	children,

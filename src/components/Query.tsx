@@ -9,8 +9,7 @@ import {
 import type React from "react";
 
 export interface QueryProps<
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 > {
 	query: DocumentNode | TypedDocumentNode<TData, TVariables>;
@@ -24,8 +23,7 @@ export interface QueryProps<
  * Following TanStack Query pattern for React 18 compatibility
  */
 export const Query = <
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 >({
 	query,

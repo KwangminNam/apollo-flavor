@@ -9,8 +9,7 @@ import {
 import type React from "react";
 
 export interface MutationRenderProps<
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 > {
 	mutate: MutationFunction<TData, TVariables>;
@@ -22,8 +21,7 @@ export interface MutationRenderProps<
 }
 
 export interface MutationProps<
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 > {
 	mutation: DocumentNode | TypedDocumentNode<TData, TVariables>;
@@ -38,17 +36,13 @@ export interface MutationProps<
  * Following TanStack Query pattern for React 18 compatibility
  */
 export const Mutation = <
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 >({
 	mutation,
 	children,
 	options = {},
 }: MutationProps<TData, TVariables>) => {
-	const [mutate, { data, loading, error, called, reset }] = useMutation<
-		TData,
-		TVariables
-	>(mutation, options);
-	return <>{children({ mutate, data, loading, error, called, reset })}</>;
+	const [mutate, result] = useMutation<TData, TVariables>(mutation, options);
+	return <>{children({ mutate, ...result })}</>;
 };
