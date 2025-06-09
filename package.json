@@ -1,29 +1,7 @@
 {
 	"name": "apollo-flavor",
-	"version": "1.4.4",
-	"description": "A declarative wrapper around Apollo Client with JSX components for SuspenseQuery and Mutation",
-  "type": "module",
-	"main": "dist/index.js",
-	"module": "dist/index.esm.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
-    }
-  },
-	"types": "dist/index.d.ts",
-	"files": ["dist"],
-	"scripts": {
-		"build": "rollup -c",
-		"dev": "rollup -c -w",
-		"test": "vitest",
-		"test:ui": "vitest --ui",
-		"test:run": "vitest run",
-		"prepublishOnly": "npm run build",
-		"type-check": "tsc --noEmit",
-		"check": "biome check --write --unsafe",
-		"format": "biome format --write --unsafe"
-	},
+	"version": "1.4.8",
+	"description": "Suspensive interfaces for Apollo Client with declarative JSX components",
 	"keywords": [
 		"apollo",
 		"apollo-client",
@@ -32,10 +10,58 @@
 		"suspense",
 		"mutation",
 		"declarative",
-		"jsx"
+		"jsx",
+		"suspensive"
 	],
-	"author": "KwangminNam",
+	"homepage": "https://github.com/KwangminNam/apollo-flavor#readme",
+	"bugs": {
+		"url": "https://github.com/KwangminNam/apollo-flavor/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/KwangminNam/apollo-flavor.git"
+	},
 	"license": "MIT",
+	"author": "KwangminNam",
+	"sideEffects": false,
+	"type": "module",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		},
+		"./package.json": "./package.json"
+	},
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"src"
+	],
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"test": "vitest",
+		"test:ui": "vitest --ui",
+		"test:run": "vitest run --coverage --typecheck",
+		"ci:publint": "publint --strict",
+		"ci:attw": "attw --pack",
+		"ci:eslint": "biome check",
+		"ci:test": "vitest run --coverage --typecheck",
+		"ci:type": "tsc --noEmit",
+		"prepack": "pnpm run build",
+		"type-check": "tsc --noEmit",
+		"check": "biome check --write --unsafe",
+		"format": "biome format --write --unsafe",
+		"clean": "rimraf ./dist ./coverage ./node_modules"
+	},
 	"peerDependencies": {
 		"@apollo/client": "^3.8.0",
 		"react": "^18.0.0 || ^19.0.0",
@@ -43,10 +69,8 @@
 	},
 	"devDependencies": {
 		"@apollo/client": "^3.8.8",
+		"@arethetypeswrong/cli": "^0.16.4",
 		"@biomejs/biome": "1.9.4",
-		"@rollup/plugin-commonjs": "^25.0.7",
-		"@rollup/plugin-node-resolve": "^15.2.3",
-		"@rollup/plugin-typescript": "^11.1.5",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "^16.3.0",
 		"@testing-library/user-event": "^14.6.1",
@@ -56,21 +80,16 @@
 		"@vitest/ui": "^3.1.4",
 		"graphql": "^16.8.1",
 		"jsdom": "^26.1.0",
+		"publint": "^0.2.12",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
-		"rollup": "^4.6.1",
-		"rollup-plugin-dts": "^6.1.0",
-		"tslib": "^2.6.2",
+		"rimraf": "^6.0.1",
+		"tsup": "^8.3.5",
 		"typescript": "^5.3.2",
 		"vitest": "^3.1.4"
 	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/KwangminNam/apollo-flavor.git"
+	"publishConfig": {
+		"access": "public"
 	},
-	"bugs": {
-		"url": "https://github.com/KwangminNam/apollo-flavor/issues"
-	},
-	"homepage": "https://github.com/KwangminNam/apollo-flavor#readme",
 	"packageManager": "pnpm@9.0.1+sha1.0e0a9c2d140ddf9aab730067eb7bcfb9e18bdee7"
 }
