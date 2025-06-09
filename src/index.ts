@@ -1,6 +1,3 @@
-// Re-export everything from Apollo Client
-export * from "@apollo/client";
-
 export { Suspense } from "react";
 
 // Export our custom components
