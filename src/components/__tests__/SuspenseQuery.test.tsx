@@ -1,7 +1,7 @@
-import { gql } from "@apollo/client";
+import { gql, type ApolloClient } from "@apollo/client";
 import { MockedProvider } from "@apollo/client/testing";
 import { act, render, screen, waitFor } from "@testing-library/react";
-import React, { Suspense } from "react";
+import  React, { Suspense } from "react";
 import { describe, expect, it } from "vitest";
 import { SuspenseQuery } from "../SuspenseQuery";
 
@@ -265,7 +265,7 @@ describe("SuspenseQuery", () => {
 			];
 
 			let networkStatus: number | undefined;
-			let apolloClient: any;
+			let apolloClient: ApolloClient<unknown> | undefined;
 
 			await act(async () => {
 				render(
@@ -302,7 +302,7 @@ describe("SuspenseQuery", () => {
 			expect(networkStatus).toBeDefined();
 			expect(typeof networkStatus).toBe("number");
 			expect(apolloClient).toBeDefined();
-			expect(apolloClient.query).toBeDefined();
+			expect(apolloClient?.query).toBeDefined();
 		});
 	});
 
@@ -462,7 +462,7 @@ describe("SuspenseQuery", () => {
 									return (
 										<div>
 											<h1 data-testid="user-name">{data.user.name}</h1>
-											<button onClick={() => refetch()}>Refetch</button>
+											<button type="button" onClick={() => refetch()}>Refetch</button>
 										</div>
 									);
 								}}

@@ -1,5 +1,5 @@
-import { ApolloError, gql } from "@apollo/client";
-import { MockedProvider } from "@apollo/client/testing";
+import {  gql } from "@apollo/client";
+import { MockedProvider, type MockedResponse } from "@apollo/client/testing";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -35,21 +35,23 @@ describe("Mutation Component", () => {
 		vi.spyOn(console, "error").mockImplementation(() => {});
 	});
 
-	const renderMutation = (mocks: any[] = []) => {
+	const renderMutation = (mocks: MockedResponse[] = [], variables?: UpdateUserVariables) => {
 		return render(
 			<MockedProvider mocks={mocks} addTypename={false}>
-				<Mutation<UpdateUserData, UpdateUserVariables> mutation={UPDATE_USER}>
+				<Mutation<UpdateUserData, UpdateUserVariables> 
+					mutation={UPDATE_USER}
+					variables={variables}
+				>
 					{({ mutate, data, loading, error, called, reset }) => (
 						<div>
 							<button
-								onClick={() =>
-									mutate({ variables: { id: "1", name: "Updated Name" } })
-								}
+								type="button"
+								onClick={() => mutate()}
 								data-testid="update-button"
 							>
 								Update User
 							</button>
-							<button onClick={reset} data-testid="reset-button">
+							<button type="button" onClick={reset} data-testid="reset-button">
 								Reset
 							</button>
 							{loading && <div data-testid="loading">Loading...</div>}
@@ -65,17 +67,18 @@ describe("Mutation Component", () => {
 		);
 	};
 
-	it("renders without crashing", () => {
+	it("오류 없이 렌더링되어야 한다", () => {
 		renderMutation();
 		expect(screen.getByTestId("update-button")).toBeInTheDocument();
 	});
 
-	it("shows loading state when mutation is in progress", async () => {
+	it("mutation이 진행 중일 때 로딩 상태를 보여줘야 한다", async () => {
+		const variables = { id: "1", name: "Updated Name" };
 		const mocks = [
 			{
 				request: {
 					query: UPDATE_USER,
-					variables: { id: "1", name: "Updated Name" },
+					variables,
 				},
 				result: {
 					data: {
@@ -86,7 +89,7 @@ describe("Mutation Component", () => {
 			},
 		];
 
-		renderMutation(mocks);
+		renderMutation(mocks, variables);
 		fireEvent.click(screen.getByTestId("update-button"));
 		expect(screen.getByTestId("loading")).toBeInTheDocument();
 
@@ -95,12 +98,13 @@ describe("Mutation Component", () => {
 		});
 	});
 
-	it("shows data after successful mutation", async () => {
+	it("성공적인 mutation 후 데이터를 보여줘야 한다", async () => {
+		const variables = { id: "1", name: "Updated Name" };
 		const mocks = [
 			{
 				request: {
 					query: UPDATE_USER,
-					variables: { id: "1", name: "Updated Name" },
+					variables,
 				},
 				result: {
 					data: {
@@ -111,7 +115,7 @@ describe("Mutation Component", () => {
 			},
 		];
 
-		renderMutation(mocks);
+		renderMutation(mocks, variables);
 		fireEvent.click(screen.getByTestId("update-button"));
 
 		await waitFor(() => {
@@ -121,36 +125,13 @@ describe("Mutation Component", () => {
 		});
 	});
 
-	// it('shows error message when mutation fails', async () => {
-	//   const errorMessage = 'Mutation failed';
-	//   const mocks = [
-	//     {
-	//       request: {
-	//         query: UPDATE_USER,
-	//         variables: { id: '1', name: 'Updated Name' },
-	//       },
-	//       error: new ApolloError({
-	//         graphQLErrors: [new Error(errorMessage)],
-	//         networkError: null,
-	//         errorMessage,
-	//       }),
-	//     },
-	//   ];
-
-	//   renderMutation(mocks);
-	//   fireEvent.click(screen.getByTestId('update-button'));
-
-	//   await waitFor(() => {
-	//     expect(screen.getByTestId('error')).toHaveTextContent(`Error: ${errorMessage}`);
-	//   });
-	// });
-
-	it("shows called state after mutation is triggered", async () => {
+	it("mutation이 트리거된 후 called 상태를 보여줘야 한다", async () => {
+		const variables = { id: "1", name: "Updated Name" };
 		const mocks = [
 			{
 				request: {
 					query: UPDATE_USER,
-					variables: { id: "1", name: "Updated Name" },
+					variables,
 				},
 				result: {
 					data: {
@@ -161,7 +142,7 @@ describe("Mutation Component", () => {
 			},
 		];
 
-		renderMutation(mocks);
+		renderMutation(mocks, variables);
 		fireEvent.click(screen.getByTestId("update-button"));
 
 		await waitFor(() => {
@@ -169,12 +150,13 @@ describe("Mutation Component", () => {
 		});
 	});
 
-	it("resets mutation state when reset is called", async () => {
+	it("reset이 호출되면 mutation 상태를 초기화해야 한다", async () => {
+		const variables = { id: "1", name: "Updated Name" };
 		const mocks = [
 			{
 				request: {
 					query: UPDATE_USER,
-					variables: { id: "1", name: "Updated Name" },
+					variables,
 				},
 				result: {
 					data: {
@@ -185,7 +167,7 @@ describe("Mutation Component", () => {
 			},
 		];
 
-		renderMutation(mocks);
+		renderMutation(mocks, variables);
 		fireEvent.click(screen.getByTestId("update-button"));
 
 		await waitFor(() => {
@@ -199,15 +181,16 @@ describe("Mutation Component", () => {
 		});
 	});
 
-	it("supports mutation options", async () => {
+	it("mutation 옵션들을 지원해야 한다", async () => {
 		const onCompletedMock = vi.fn();
 		const onErrorMock = vi.fn();
+		const variables = { id: "1", name: "Updated Name" };
 
 		const mocks = [
 			{
 				request: {
 					query: UPDATE_USER,
-					variables: { id: "1", name: "Updated Name" },
+					variables,
 				},
 				result: {
 					data: {
@@ -222,6 +205,7 @@ describe("Mutation Component", () => {
 			<MockedProvider mocks={mocks} addTypename={false}>
 				<Mutation<UpdateUserData, UpdateUserVariables>
 					mutation={UPDATE_USER}
+					variables={variables}
 					options={{
 						onCompleted: onCompletedMock,
 						onError: onErrorMock,
@@ -229,9 +213,8 @@ describe("Mutation Component", () => {
 				>
 					{({ mutate }) => (
 						<button
-							onClick={() =>
-								mutate({ variables: { id: "1", name: "Updated Name" } })
-							}
+							type="button"
+							onClick={() => mutate()}
 							data-testid="update-button"
 						>
 							Update User
