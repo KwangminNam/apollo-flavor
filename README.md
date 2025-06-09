@@ -25,7 +25,6 @@ pnpm add apollo-flavor
 yarn add apollo-flavor
 ```
 
-**참고**: 이 패키지는 Apollo Client를 peer dependency로 포함하고 있어서 별도로 `@apollo/client`를 설치할 필요가 없습니다.
 
 ## 사용법
 
