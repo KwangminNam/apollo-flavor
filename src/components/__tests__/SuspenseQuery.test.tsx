@@ -487,4 +487,235 @@ describe("SuspenseQuery", () => {
 			expect(typeof refetchFn).toBe("function");
 		});
 	});
+
+	describe("Suspense 로딩 상태 및 데이터 전환", () => {
+		it("로딩 상태가 표시되고 데이터로 전환되어야 한다", async () => {
+			const mocks = [
+				{
+					request: {
+						query: GET_USER,
+						variables: { id: "1" },
+					},
+					result: {
+						data: { user: mockUser },
+					},
+					delay: 200, // 로딩 상태를 확인하기 위한 지연
+				},
+			];
+
+			await act(async () => {
+				render(
+					<MockedProvider mocks={mocks} addTypename={false}>
+						<Suspense fallback={<div data-testid="suspense-loading">Loading user data...</div>}>
+							<SuspenseQuery<GetUserData, GetUserVariables>
+								query={GET_USER}
+								variables={{ id: "1" }}
+							>
+								{({ data }) => (
+									<div data-testid="user-content">
+										<h1 data-testid="user-name">{data.user.name}</h1>
+										<p data-testid="user-email">{data.user.email}</p>
+									</div>
+								)}
+							</SuspenseQuery>
+						</Suspense>
+					</MockedProvider>,
+				);
+			});
+
+			// 초기에는 로딩 상태가 표시되어야 함
+			expect(screen.getByTestId("suspense-loading")).toBeInTheDocument();
+			expect(screen.getByTestId("suspense-loading")).toHaveTextContent("Loading user data...");
+
+			// 데이터가 없는 상태에서는 user-content가 없어야 함
+			expect(screen.queryByTestId("user-content")).not.toBeInTheDocument();
+
+			// 데이터 로딩 완료 후 실제 데이터가 표시되어야 함
+			await act(async () => {
+				await flushPromises();
+			});
+
+			await waitFor(
+				() => {
+					expect(screen.getByTestId("user-content")).toBeInTheDocument();
+					expect(screen.getByTestId("user-name")).toHaveTextContent("John Doe");
+					expect(screen.getByTestId("user-email")).toHaveTextContent("john@example.com");
+				},
+				{ timeout: 3000 }
+			);
+
+			// 로딩 상태는 사라져야 함
+			expect(screen.queryByTestId("suspense-loading")).not.toBeInTheDocument();
+		});
+
+		it("여러 쿼리의 로딩 상태를 독립적으로 관리해야 한다", async () => {
+			const userMocks = [
+				{
+					request: {
+						query: GET_USER,
+						variables: { id: "1" },
+					},
+					result: {
+						data: { user: mockUser },
+					},
+					delay: 100,
+				},
+			];
+
+			const usersMocks = [
+				{
+					request: {
+						query: GET_USERS,
+					},
+					result: {
+						data: { users: mockUsers },
+					},
+					delay: 300, // 더 긴 지연
+				},
+			];
+
+			await act(async () => {
+				render(
+					<MockedProvider mocks={[...userMocks, ...usersMocks]} addTypename={false}>
+						<div>
+							{/* 첫 번째 쿼리 */}
+							<Suspense fallback={<div data-testid="user-loading">Loading single user...</div>}>
+								<SuspenseQuery<GetUserData, GetUserVariables>
+									query={GET_USER}
+									variables={{ id: "1" }}
+								>
+									{({ data }) => (
+										<div data-testid="single-user">
+											<span data-testid="single-user-name">{data.user.name}</span>
+										</div>
+									)}
+								</SuspenseQuery>
+							</Suspense>
+
+							{/* 두 번째 쿼리 */}
+							<Suspense fallback={<div data-testid="users-loading">Loading users list...</div>}>
+								<SuspenseQuery<GetUsersData>
+									query={GET_USERS}
+								>
+									{({ data }) => (
+										<div data-testid="users-list">
+											{data.users.map((user) => (
+												<span key={user.id} data-testid={`user-${user.id}`}>
+													{user.name}
+												</span>
+											))}
+										</div>
+									)}
+								</SuspenseQuery>
+							</Suspense>
+						</div>
+					</MockedProvider>,
+				);
+			});
+
+			// 초기에는 둘 다 로딩 상태
+			expect(screen.getByTestId("user-loading")).toBeInTheDocument();
+			expect(screen.getByTestId("users-loading")).toBeInTheDocument();
+
+			// 첫 번째 쿼리가 먼저 완료됨 (100ms 후)
+			await act(async () => {
+				await flushPromises();
+			});
+
+			await waitFor(
+				() => {
+					expect(screen.getByTestId("single-user")).toBeInTheDocument();
+					expect(screen.getByTestId("single-user-name")).toHaveTextContent("John Doe");
+				},
+				{ timeout: 2000 }
+			);
+
+			// 첫 번째는 완료되었지만 두 번째는 아직 로딩 중일 수 있음
+			expect(screen.queryByTestId("user-loading")).not.toBeInTheDocument();
+			
+			// 두 번째 쿼리 완료 대기
+			await act(async () => {
+				await flushPromises();
+			});
+
+			await waitFor(
+				() => {
+					expect(screen.getByTestId("users-list")).toBeInTheDocument();
+					expect(screen.getByTestId("user-1")).toHaveTextContent("John Doe");
+					expect(screen.getByTestId("user-2")).toHaveTextContent("Jane Smith");
+				},
+				{ timeout: 2000 }
+			);
+
+			// 모든 로딩 상태가 사라짐
+			expect(screen.queryByTestId("user-loading")).not.toBeInTheDocument();
+			expect(screen.queryByTestId("users-loading")).not.toBeInTheDocument();
+		});
+
+		it("네트워크 지연 시 적절한 시간 동안 로딩 상태를 유지해야 한다", async () => {
+			const mocks = [
+				{
+					request: {
+						query: GET_USER,
+						variables: { id: "1" },
+					},
+					result: {
+						data: { user: mockUser },
+					},
+					delay: 500, // 500ms 지연
+				},
+			];
+
+			const startTime = Date.now();
+
+			await act(async () => {
+				render(
+					<MockedProvider mocks={mocks} addTypename={false}>
+						<Suspense fallback={<div data-testid="network-loading">Loading with network delay...</div>}>
+							<SuspenseQuery<GetUserData, GetUserVariables>
+								query={GET_USER}
+								variables={{ id: "1" }}
+							>
+								{({ data }) => (
+									<div data-testid="delayed-content">
+										<span data-testid="delayed-user-name">{data.user.name}</span>
+									</div>
+								)}
+							</SuspenseQuery>
+						</Suspense>
+					</MockedProvider>,
+				);
+			});
+
+			// 로딩 상태 확인
+			expect(screen.getByTestId("network-loading")).toBeInTheDocument();
+
+			// 최소 300ms 동안은 로딩 상태가 유지되어야 함
+			await new Promise(resolve => setTimeout(resolve, 300));
+			expect(screen.getByTestId("network-loading")).toBeInTheDocument();
+			expect(screen.queryByTestId("delayed-content")).not.toBeInTheDocument();
+
+			// 데이터 로딩 완료 대기
+			await act(async () => {
+				await flushPromises();
+			});
+
+			await waitFor(
+				() => {
+					expect(screen.getByTestId("delayed-content")).toBeInTheDocument();
+					expect(screen.getByTestId("delayed-user-name")).toHaveTextContent("John Doe");
+				},
+				{ timeout: 3000 }
+			);
+
+			const endTime = Date.now();
+			const loadingDuration = endTime - startTime;
+
+			// 로딩이 최소 400ms 이상 지속되었는지 확인 (500ms 지연 - 여유분)
+			expect(loadingDuration).toBeGreaterThan(400);
+
+			// 로딩 상태가 사라졌는지 확인
+			expect(screen.queryByTestId("network-loading")).not.toBeInTheDocument();
+		});
+	});
 });

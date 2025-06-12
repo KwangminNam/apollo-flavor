@@ -1,7 +1,7 @@
 export { Suspense } from "react";
 
-// Export our custom components
 export { SuspenseQuery } from "./components/SuspenseQuery";
+export { SuspenseFragment } from "./components/SuspenseFragment";
 export { Mutation } from "./components/Mutation";
 export { Query } from "./components/Query";
 export { Subscription } from "./components/Subscription";
@@ -22,6 +22,7 @@ export {
 export type { MutationProps, MutationRenderProps } from "./components/Mutation";
 export type { QueryProps } from "./components/Query";
 export type { SubscriptionProps } from "./components/Subscription";
+export type { SuspenseFragmentProps } from "./components/SuspenseFragment";
 
 // Export hook types
 export type { QueryConfig, QueriesResult } from "./hooks/useQueries";
