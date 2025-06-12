@@ -193,7 +193,7 @@ function PostPage() {
 }
 ```
 
-#### apollo-flavor 로 변환
+### apollo-flavor 에선?
 
 ```tsx
 function PostPage({ postId }) {
