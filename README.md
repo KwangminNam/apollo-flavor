@@ -5,14 +5,6 @@
 해당 라이브러리는 [Toss/Suspensive](https://github.com/toss/suspensive)의 모티브를 받아 Apollo Client와 GraphQL을 사용하는 개발자들을 위해 만들어졌습니다.
 Apollo Client를 위한 선언적 JSX 컴포넌트 라이브러리입니다. **Suspense와 비동기 데이터 페칭을 같은 컴포넌트 depth에서 선언적으로 처리**할 수 있게 해주어, 더 직관적이고 유지보수하기 쉬운 React 애플리케이션을 만들 수 있습니다.
 
-## 주요 기능
-
-- **🎯 선언적 API**: `<SuspenseQuery>`와 `<SuspenseFragment>` JSX 컴포넌트
-- **📏 단일 Depth**: Suspense와 데이터 페칭을 같은 컴포넌트 레벨에서 처리
-- **⚡ React Suspense 최적화**: React 18/19 Suspense와 완벽 통합
-- **📦 TypeScript 완전 지원**: 완벽한 타입 추론과 안전성
-- **🎨 컴포넌트 순수성**: 프레젠테이션 컴포넌트의 순수성 보장
-
 ## 📦 설치
 
 ```bash
