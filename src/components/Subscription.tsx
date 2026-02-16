@@ -9,8 +9,7 @@ import {
 import type React from "react";
 
 export interface SubscriptionProps<
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 > {
 	subscription: DocumentNode | TypedDocumentNode<TData, TVariables>;
@@ -22,20 +21,19 @@ export interface SubscriptionProps<
 	>;
 }
 
-export function Subscription<
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	TData = any,
+export const Subscription = <
+	TData = unknown,
 	TVariables extends OperationVariables = OperationVariables,
 >({
 	subscription,
 	variables,
 	children,
 	options = {},
-}: SubscriptionProps<TData, TVariables>) {
+}: SubscriptionProps<TData, TVariables>) => {
 	const result = useSubscription<TData, TVariables>(subscription, {
 		variables,
 		...options,
 	});
 
 	return <>{children(result)}</>;
-}
+};

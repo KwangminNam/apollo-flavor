@@ -8,6 +8,15 @@ import {
 } from "@apollo/client";
 import type { ReactNode } from "react";
 
+export interface SuspenseQueryProps<
+	TData = unknown,
+	TVariables extends OperationVariables = OperationVariables,
+> extends SuspenseQueryHookOptions<TData, TVariables> {
+	children: (result: UseSuspenseQueryResult<TData, TVariables>) => ReactNode;
+	query: DocumentNode | TypedDocumentNode<TData, TVariables>;
+	variables?: TVariables;
+}
+
 /**
  * SuspenseQuery component compatible with React 18/19 and Next.js 12-15
  * Note: This component should be wrapped with <Suspense> by the user
@@ -35,11 +44,7 @@ export const SuspenseQuery = <
 	query,
 	variables,
 	...options
-}: SuspenseQueryHookOptions<TData, TVariables> & {
-	children: (result: UseSuspenseQueryResult<TData, TVariables>) => ReactNode;
-	query: DocumentNode | TypedDocumentNode<TData, TVariables>;
-	variables?: TVariables;
-}) => (
+}: SuspenseQueryProps<TData, TVariables>) => (
 	<>
 		{children(
 			useSuspenseQuery<TData, TVariables>(query, { variables, ...options }),

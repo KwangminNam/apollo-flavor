@@ -1,7 +1,7 @@
 {
 	"name": "apollo-flavor",
 	"version": "1.4.8",
-	"description": "Suspensive interfaces for Apollo Client with declarative JSX components",
+	"description": "Apollo Client JSX components that eliminate Suspense 2-depth problem",
 	"keywords": [
 		"apollo",
 		"apollo-client",
@@ -9,9 +9,10 @@
 		"graphql",
 		"suspense",
 		"mutation",
-		"declarative",
+		"render-props",
 		"jsx",
-		"suspensive"
+		"2-depth",
+		"useSuspenseQuery"
 	],
 	"homepage": "https://github.com/KwangminNam/apollo-flavor#readme",
 	"bugs": {
@@ -60,7 +61,13 @@
 		"type-check": "tsc --noEmit",
 		"check": "biome check --write --unsafe",
 		"format": "biome format --write --unsafe",
-		"clean": "rimraf ./dist ./coverage ./node_modules"
+		"clean": "rimraf ./dist ./coverage ./node_modules",
+		"changeset": "changeset",
+		"version-packages": "changeset version",
+		"release": "pnpm build && changeset publish"
+	},
+	"engines": {
+		"node": ">=18.0.0"
 	},
 	"peerDependencies": {
 		"@apollo/client": "^3.8.0",
@@ -71,6 +78,7 @@
 		"@apollo/client": "^3.8.8",
 		"@arethetypeswrong/cli": "^0.16.4",
 		"@biomejs/biome": "1.9.4",
+		"@changesets/cli": "^2.29.8",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "^16.3.0",
 		"@testing-library/user-event": "^14.6.1",

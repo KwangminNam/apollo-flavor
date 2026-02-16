@@ -1,9 +1,7 @@
-# WIP..
-
 ## apollo-flavor
 
 해당 라이브러리는 [Toss/Suspensive](https://github.com/toss/suspensive)의 모티브를 받아 Apollo Client와 GraphQL을 사용하는 개발자들을 위해 만들어졌습니다.
-Apollo Client를 위한 선언적 JSX 컴포넌트 라이브러리입니다. **Suspense와 비동기 데이터 페칭을 같은 컴포넌트 depth에서 선언적으로 처리**할 수 있게 해주어, 더 직관적이고 유지보수하기 쉬운 React 애플리케이션을 만들 수 있습니다.
+Apollo Client를 위한 JSX 컴포넌트 라이브러리로, **Suspense 2Depth 문제를 해결**하여 Suspense와 비동기 데이터 페칭을 같은 컴포넌트 depth에서 처리할 수 있게 해줍니다.
 
 ## 📦 설치
 
@@ -16,7 +14,7 @@ yarn add apollo-flavor
 ```
 
 
-### 문제: 기존 Apollo Client의 useSuspenseQuery와 Suspense의 복잡한 컴포넌트 구조
+### 문제: useSuspenseQuery의 Suspense 2Depth 문제
 
 ```tsx
 // ❌ 기존 방식: Suspense와 데이터 페칭이 분리된 depth
@@ -41,10 +39,10 @@ function UserPosts({ userId }) {
 }
 ```
 
-### apollo-flavor 에선?: 같은 depth에서 선언적 처리
+### apollo-flavor: Suspense 2Depth 없는 같은 depth 처리
 
 ```tsx
-// ✅ declare-apollo: Suspense와 데이터 페칭이 같은 depth에서 선언적으로 처리
+// ✅ apollo-flavor: Suspense와 데이터 페칭이 같은 depth에서 처리
 function UserPage({ userId }) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -65,12 +63,12 @@ function UserPage({ userId }) {
 
 ## 🎨 사용법
 
-### SuspenseQuery: 선언적 쿼리 컴포넌트
+### SuspenseQuery: Suspense 2Depth 없는 쿼리 컴포넌트
 
 #### 기본 사용법
 
 ```tsx
-import { SuspenseQuery } from "declare-apollo";
+import { SuspenseQuery } from "apollo-flavor";
 import { gql } from "@apollo/client";
 
 const GET_USER = gql`
@@ -102,11 +100,11 @@ function UserProfile({ userId }) {
 }
 ```
 
-### SuspenseFragment: 선언적 프래그먼트 컴포넌트
+### SuspenseFragment: Suspense 2Depth 없는 프래그먼트 컴포넌트
 
 [@apollo/client/useSuspenseFragment](https://www.apollographql.com/docs/react/data/fragments#usesuspensefragment)
 
-#### GraphQL Fragment를 선언적으로 처리할 수 있습니다.
+#### GraphQL Fragment를 같은 depth에서 처리할 수 있습니다.
 
 ##### 기존의 useSuspenseFragment의 사용사례 입니다.
 
@@ -185,7 +183,7 @@ function PostPage() {
 }
 ```
 
-### apollo-flavor 에선?
+### apollo-flavor에선?
 
 ```tsx
 function PostPage({ postId }) {

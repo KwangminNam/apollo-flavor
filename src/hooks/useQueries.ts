@@ -1,13 +1,13 @@
-import { 
-  type QueryResult, 
-  useQuery, 
-  type ApolloError, 
-  type ApolloQueryResult, 
+import {
+  type QueryResult,
+  useQuery,
+  type ApolloError,
+  type ApolloQueryResult,
   type OperationVariables,
   type SubscribeToMoreOptions
 } from "@apollo/client";
 import type { DocumentNode } from "graphql";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 export interface QueryConfig<TData = unknown, TVariables extends OperationVariables = OperationVariables> {
   query: DocumentNode;
@@ -53,6 +53,15 @@ export function useQueries<T extends readonly QueryConfig[]>(
       ? QueriesResult<TData, TVariables>
       : QueriesResult<unknown, OperationVariables>;
 } {
+  // Runtime invariant: detect queries array length changes (Rules of Hooks violation)
+  const queriesLengthRef = useRef(queries.length);
+  if (queriesLengthRef.current !== queries.length) {
+    throw new Error(
+      `useQueries: The number of queries changed between renders (from ${queriesLengthRef.current} to ${queries.length}). ` +
+      `This violates the Rules of Hooks. The queries array must have a constant length.`
+    );
+  }
+
   // Execute all queries using useQuery hook
   const results = queries.map((queryConfig) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks

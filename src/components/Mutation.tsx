@@ -29,12 +29,13 @@ export interface MutationProps<
 	children: (
 		mutationResult: MutationRenderProps<TData, TVariables>,
 	) => React.ReactNode;
-	options?: Omit<MutationHookOptions<TData, TVariables>, 'variables'>;
+	options?: Omit<MutationHookOptions<TData, TVariables>, "variables">;
+	throwOnError?: boolean;
 }
 
 /**
  * Mutation component compatible with React 18/19 and Next.js 12-15
- * 
+ *
  * @example
  *     <Mutation<IPostMutation, IPostMutationVariables>
  *       mutation={CREATE_POST}
@@ -68,10 +69,16 @@ export const Mutation = <
 	variables,
 	children,
 	options = {},
+	throwOnError = false,
 }: MutationProps<TData, TVariables>) => {
 	const [mutate, result] = useMutation<TData, TVariables>(mutation, {
 		...options,
 		variables,
 	});
+
+	if (throwOnError && result.error) {
+		throw result.error;
+	}
+
 	return <>{children({ mutate, ...result })}</>;
 };

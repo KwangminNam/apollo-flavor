@@ -231,4 +231,108 @@ describe("Mutation Component", () => {
 		});
 		expect(onErrorMock).not.toHaveBeenCalled();
 	});
+
+	it("throwOnError가 true일 때 에러를 렌더 사이클에서 throw하여 에러 바운더리에 잡혀야 한다", async () => {
+		const variables = { id: "1", name: "Updated Name" };
+		const mocks: MockedResponse[] = [
+			{
+				request: {
+					query: UPDATE_USER,
+					variables,
+				},
+				error: new Error("Mutation failed"),
+			},
+		];
+
+		// Simple error boundary for testing
+		class TestErrorBoundary extends React.Component<
+			{ children: React.ReactNode },
+			{ error: Error | null }
+		> {
+			state = { error: null as Error | null };
+			static getDerivedStateFromError(error: Error) {
+				return { error };
+			}
+			render() {
+				if (this.state.error) {
+					return <div data-testid="boundary-error">{this.state.error.message}</div>;
+				}
+				return this.props.children;
+			}
+		}
+
+		render(
+			<MockedProvider mocks={mocks} addTypename={false}>
+				<TestErrorBoundary>
+					<Mutation<UpdateUserData, UpdateUserVariables>
+						mutation={UPDATE_USER}
+						variables={variables}
+						throwOnError
+					>
+						{({ mutate, loading }) => (
+							<div>
+								<button
+									type="button"
+									onClick={() => mutate().catch(() => {})}
+									data-testid="update-button"
+								>
+									Update
+								</button>
+								{loading && <div data-testid="loading">Loading...</div>}
+							</div>
+						)}
+					</Mutation>
+				</TestErrorBoundary>
+			</MockedProvider>,
+		);
+
+		fireEvent.click(screen.getByTestId("update-button"));
+
+		await waitFor(() => {
+			expect(screen.getByTestId("boundary-error")).toHaveTextContent(
+				"Mutation failed",
+			);
+		});
+	});
+
+	it("throwOnError가 false(기본값)일 때 에러를 throw하지 않아야 한다", async () => {
+		const variables = { id: "1", name: "Updated Name" };
+		const mocks: MockedResponse[] = [
+			{
+				request: {
+					query: UPDATE_USER,
+					variables,
+				},
+				error: new Error("Mutation failed"),
+			},
+		];
+
+		render(
+			<MockedProvider mocks={mocks} addTypename={false}>
+				<Mutation<UpdateUserData, UpdateUserVariables>
+					mutation={UPDATE_USER}
+					variables={variables}
+				>
+					{({ mutate, error }) => (
+						<div>
+							<button
+								type="button"
+								onClick={() => mutate().catch(() => {})}
+								data-testid="update-button"
+							>
+								Update
+							</button>
+							{error && <div data-testid="error">{error.message}</div>}
+						</div>
+					)}
+				</Mutation>
+			</MockedProvider>,
+		);
+
+		fireEvent.click(screen.getByTestId("update-button"));
+
+		await waitFor(() => {
+			expect(screen.getByTestId("error")).toHaveTextContent("Mutation failed");
+		});
+	});
 });
