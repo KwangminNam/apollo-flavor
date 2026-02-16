@@ -1,6 +1,6 @@
 {
 	"name": "apollo-flavor",
-	"version": "1.4.8",
+	"version": "2.0.0",
 	"description": "Apollo Client JSX components that eliminate Suspense 2-depth problem",
 	"keywords": [
 		"apollo",
